@@ -2,6 +2,7 @@
 
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+import asyncio
 import io
 
 import discord
@@ -145,8 +146,9 @@ async def send_screenshot(channel):
     arr.seek(0)
     file = discord.File(arr, 'a.png')
     # send screenshot to channel
-    await channel.send(file=file)
-
+    message = await channel.send(file=file)
+    await asyncio.sleep(1)
+    await message.delete()
 
 with open('token.json') as json_file:
     token_json = json.load(json_file)
