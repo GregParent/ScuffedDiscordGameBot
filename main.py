@@ -121,7 +121,7 @@ async def on_message(message):
         sendInput("anl")
     if message.content.lower().startswith('anr') and retroarchOpen:
         sendInput("anr")
-    await message.delete(message)
+    await message.delete()
 
 def process_exists(process_name):
     call = 'TASKLIST', '/FI', 'imagename eq %s' % process_name
