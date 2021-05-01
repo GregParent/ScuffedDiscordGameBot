@@ -11,26 +11,47 @@ def sendInput(input):
         keyboard.press(Key.enter)
     if inputCharacter == "select":
         keyboard.press(Key.shift_r)
-    if inputCharacter == 'w':
+    if inputCharacter == 'f1':  # RetroArch Menu button
+        keyboard.press('Key.f1')
+    if inputCharacter == 'up':
         keyboard.type('w')
-    if inputCharacter == 'a':
+    if inputCharacter == 'left':
         keyboard.type('a')
-    if inputCharacter == 's':
+    if inputCharacter == 'down':
         keyboard.type('s')
-    if inputCharacter == 'd':
+    if inputCharacter == 'right':
         keyboard.type('d')
-    if inputCharacter == '6':  # A button
+
+    if inputCharacter == 'a':  # A button
         keyboard.type('6')
-    if inputCharacter == '2':  # B button
+    if inputCharacter == 'b':  # B button
         keyboard.type('2')
-    if inputCharacter == '8':  # X button
+    if inputCharacter == 'x':  # X button
         keyboard.type('8')
-    if inputCharacter == '4':  # Y button
+    if inputCharacter == 'y':  # Y button
         keyboard.type('4')
-    if inputCharacter == '7':  # L1 button
+
+    if inputCharacter == 'l1':  # L1 button
         keyboard.type('7')
-    if inputCharacter == '9':  # R1 button
+    if inputCharacter == 'l2':  # R1 button
         keyboard.type('9')
+    if inputCharacter == 'l2':  # L2 button
+        keyboard.type('o')
+    if inputCharacter == 'r2':  # R2 button
+        keyboard.type('p')
+    if inputCharacter == 'l3':  # L3 button
+        keyboard.type('k')
+    if inputCharacter == 'r3':  # R3 button
+        keyboard.type('l')
+
+    if inputCharacter == 'anu':  # Analog Up button
+        keyboard.type('b')
+    if inputCharacter == 'and':  # Analog Down button
+        keyboard.type('n')
+    if inputCharacter == 'anl':  # Analog Left button
+        keyboard.type('m')
+    if inputCharacter == 'anr':  # Analog Right button
+        keyboard.type(',')
 
 
 sendInput("start")
