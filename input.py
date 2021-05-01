@@ -33,7 +33,7 @@ def sendInput(input):
 
     if inputCharacter == 'l1':  # L1 button
         pydirectinput.press('7')
-    if inputCharacter == 'l2':  # R1 button
+    if inputCharacter == 'r1':  # R1 button
         pydirectinput.press('9')
     if inputCharacter == 'l2':  # L2 button
         pydirectinput.press('o')
