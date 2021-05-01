@@ -153,4 +153,5 @@ fabric.properties
 # Folders for the project
 retroarch/
 games/
+settings/
 /token.json
