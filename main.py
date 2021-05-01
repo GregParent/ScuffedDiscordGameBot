@@ -23,6 +23,7 @@ client = discord.Client()
 retroarchOpen = False
 retroarchProcess = None
 
+
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
@@ -47,7 +48,7 @@ async def on_message(message):
         if retroarchOpen:
             await message.channel.send('Retroarch was already started!')
         else:
-            retroarchProcess = subprocess.Popen('./retroarch/retroarch.exe')
+            retroarchProcess = subprocess.Popen('C:/RetroArch-Win64/retroarch.exe')
             if process_exists('retroarch.exe'):
                 retroarchOpen = True
 
@@ -59,18 +60,26 @@ async def on_message(message):
                 sendInput("right")
 
                 send_screenshot.start(message.channel)  # start the screenshot thread
-                await message.channel.send('Started Retroarch!')
+                startMessage = await message.channel.send('Started Retroarch!')
+                await asyncio.sleep(10)
+                await startMessage.delete()
             else:
-                await message.channel.send('Retroarch was not started...')
+                startMessage = await message.channel.send('Retroarch was not started...')
+                await asyncio.sleep(10)
+                await startMessage.delete()
 
     if message.content.startswith('emuStop'):
         if retroarchOpen:
             retroarchProcess.terminate()
             send_screenshot.stop()
             retroarchOpen = False
-            await message.channel.send('Stopped Retroarch!')
+            stopMessage = await message.channel.send('Stopped Retroarch!')
+            await asyncio.sleep(10)
+            await stopMessage.delete()
         else:
-            await message.channel.send('No Retroarch process to stop...')
+            stopMessage = await message.channel.send('No Retroarch process to stop...')
+            await asyncio.sleep(10)
+            await stopMessage.delete()
 
     if message.content.lower().startswith('start') and retroarchOpen:
         sendInput("start")
@@ -112,6 +121,7 @@ async def on_message(message):
         sendInput("anl")
     if message.content.lower().startswith('anr') and retroarchOpen:
         sendInput("anr")
+    await message.delete(message)
 
 def process_exists(process_name):
     call = 'TASKLIST', '/FI', 'imagename eq %s' % process_name
@@ -147,8 +157,9 @@ async def send_screenshot(channel):
     file = discord.File(arr, 'a.png')
     # send screenshot to channel
     message = await channel.send(file=file)
-    await asyncio.sleep(1)
+    await asyncio.sleep(1.2)
     await message.delete()
+
 
 with open('token.json') as json_file:
     token_json = json.load(json_file)
