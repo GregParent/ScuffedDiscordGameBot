@@ -51,14 +51,14 @@ async def on_message(message):
             if process_exists('retroarch.exe'):
                 retroarchOpen = True
 
-                time.sleep(1)
+                time.sleep(1)  # navigate to the history menu for easy game access
                 sendInput("left")
                 sendInput("down")
                 sendInput("down")
                 sendInput("down")
                 sendInput("right")
 
-                send_screenshot.start(message.channel)
+                send_screenshot.start(message.channel)  # start the screenshot thread
                 await message.channel.send('Started Retroarch!')
             else:
                 await message.channel.send('Retroarch was not started...')
