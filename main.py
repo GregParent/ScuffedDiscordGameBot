@@ -8,9 +8,11 @@ import json
 
 client = discord.Client()
 
+
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
+
 
 @client.event
 async def on_message(message):
@@ -19,6 +21,11 @@ async def on_message(message):
 
     if message.content.startswith('$hello'):
         await message.channel.send('Hello!')
+
+    if message.content.startswith('$startGame'):
+        response = "Starting game" + message.content[10::1]
+        await message.channel.send(response)
+
 
 with open('token.json') as json_file:
     token_json = json.load(json_file)
