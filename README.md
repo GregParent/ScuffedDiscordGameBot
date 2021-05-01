@@ -1,4 +1,4 @@
-# 60FPS Emu Discord Bot
+# 60FPM (frrames per minute) Emu Discord Bot
 This bot was created for Systemshacks 2021: Scuffedhacks Hackathon!
 The main goal was to create something scuffed, and so we decided to make a
 bot that would allow you to play emulator games on Discord in a scuffed way 
