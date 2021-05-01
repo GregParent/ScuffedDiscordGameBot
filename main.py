@@ -48,7 +48,7 @@ async def on_message(message):
         if retroarchOpen:
             await message.channel.send('Retroarch was already started!')
         else:
-            retroarchProcess = subprocess.Popen('C:/RetroArch-Win64/retroarch.exe')
+            retroarchProcess = subprocess.Popen('./retroarch/retroarch.exe')
             if process_exists('retroarch.exe'):
                 retroarchOpen = True
 
