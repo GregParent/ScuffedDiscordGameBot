@@ -9,13 +9,15 @@ Create an easy to use API to implement it in your own UI
 
 import os
 import time
-import Queue
+import queue
 import logging
 import threading
 import subprocess
 
 __version__ = 0.02
 __copyright__ = 'GPL V2'
+
+from past.builtins import xrange
 
 
 class RetroArchPythonApi(object):
@@ -38,7 +40,7 @@ class RetroArchPythonApi(object):
     api.stop()
     """
 
-    _stderr_queue = Queue.Queue()
+    _stderr_queue = queue.Queue()
     rom_path = None
 
     _fullscreen = None
