@@ -3,7 +3,9 @@ from pynput.keyboard import Controller
 keyboard = Controller()
 
 
-def sendInput(inputCharacter):
+def sendInput(input):
+    inputCharacter = input.lower()
+
     if inputCharacter == 'w' or inputCharacter == 'W':
         keyboard.type('w')
     if inputCharacter == 'a' or inputCharacter == 'A':
