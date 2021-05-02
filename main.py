@@ -12,11 +12,11 @@ import subprocess
 import threading
 import time
 
-from PIL import ImageGrab
+from PIL import ImageGrab, Image
 import win32gui
 from discord.ext import tasks
 from input import sendInput
-from retroarchpythonapi import RetroArchPythonApi as RetroAPI
+import numpy as np
 
 client = discord.Client()
 
@@ -50,27 +50,10 @@ async def on_message(message):
         if retroarchOpen:
             await message.channel.send('Retroarch was already started!')
         else:
-
             retroarchProcess = subprocess.Popen('./retroarch/retroarch.exe')
             if process_exists('retroarch.exe'):
                 retroarchOpen = True
-                waitingForModeMessage = await message.channel.send('Please choose a mode: (Will default to scuffed '
-                                                                   'mode in 10 seconds)')
-                for i in range(10):
-                    time.sleep(i)
-                    if message.content.lower().startswith('scuffedmode'):
-                        flag = 0
-                        break
-                    elif message.content.lower().startswith('asciimode'):
-                        flag = 1
-                        break
-                    elif message.content.lower().startswith('gamermode'):
-                        flag = 2
-                        break
-                    else:
-                        flag = 0
-                        break
-                waitingForModeMessage.delete()
+
                 time.sleep(1)  # navigate to the history menu for easy game access
                 sendInput("left")
                 sendInput("down")
@@ -105,11 +88,11 @@ async def on_message(message):
             stopMessage = await message.channel.send('No Retroarch process to stop...')
             await asyncio.sleep(10)
             await stopMessage.delete()
-    if message.content.lower().startswith('scuffedmode'):
+    if message.content.lower().startswith('scuffedmode') and retroarchOpen:
         flag = 0
-    if message.content.lower().startswith('asciimode'):
+    if message.content.lower().startswith('asciimode') and retroarchOpen:
         flag = 1
-    if message.content.lower().startswith('gamermode'):
+    if message.content.lower().startswith('gamermode') and retroarchOpen:
         flag = 2
     if message.content.lower().startswith('start') and retroarchOpen:
         sendInput("start")
@@ -191,8 +174,35 @@ async def send_screenshot(channel):
     await asyncio.sleep(1.2)
     await message.delete()
 
+@tasks.loop(seconds=1.0)
 async def send_ascii_screenshot(channel):  # ENTER YOUR ASCII CODE HERE
-    print("HERE")
+    # take a screenshot and save to disk
+    toplist, winlist = [], []
+
+    def enum_cb(hwnd, results):
+        winlist.append((hwnd, win32gui.GetWindowText(hwnd)))
+
+    win32gui.EnumWindows(enum_cb, toplist)
+
+    retroarch = [(hwnd, title) for hwnd, title in winlist if 'retroarch' in title.lower()]
+    # just grab the hwnd for first window matching retroarch
+    retroarch = retroarch[0]
+    hwnd = retroarch[0]
+
+    # win32gui.SetForegroundWindow(hwnd)
+    bbox = win32gui.GetWindowRect(hwnd)
+    chars = np.asarray(list(' .,:;irsXA253hMHGS#9B&@'))
+
+    f, SC, GCF, WCF = .1, .1, 1, 7 / 4
+
+    img = ImageGrab.grab(bbox)
+    S = (round(img.size[0] * SC * WCF), round(img.size[1] * SC))
+    img = np.sum(np.asarray(img.resize(S)), axis=2)
+    img -= img.min()
+    img = (1.0 - img / img.max()) ** GCF * (chars.size - 1)
+
+    message = await channel.content("\n".join(("".join(r) for r in chars[img.astype(int)])))
+    await asyncio.sleep(1.2)
 
 with open('token.json') as json_file:
     token_json = json.load(json_file)
