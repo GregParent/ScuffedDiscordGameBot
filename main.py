@@ -54,16 +54,22 @@ async def on_message(message):
             retroarchProcess = subprocess.Popen('./retroarch/retroarch.exe')
             if process_exists('retroarch.exe'):
                 retroarchOpen = True
-                time.sleep(5)
-                waitingForModeMessage = await message.channel.send('Please choose a mode: (Will default to scuffed mode in 10 seconds)')
-                if message.content.lower().startswith('scuffedmode'):
-                    flag = 0
-                elif message.content.lower().startswith('asciimode'):
-                    flag = 1
-                elif message.content.lower().startswith('gamermode'):
-                    flag = 2
-                else:
-                    flag = 0
+                waitingForModeMessage = await message.channel.send('Please choose a mode: (Will default to scuffed '
+                                                                   'mode in 10 seconds)')
+                for i in range(10):
+                    time.sleep(i)
+                    if message.content.lower().startswith('scuffedmode'):
+                        flag = 0
+                        break
+                    elif message.content.lower().startswith('asciimode'):
+                        flag = 1
+                        break
+                    elif message.content.lower().startswith('gamermode'):
+                        flag = 2
+                        break
+                    else:
+                        flag = 0
+                        break
                 waitingForModeMessage.delete()
                 time.sleep(1)  # navigate to the history menu for easy game access
                 sendInput("left")
