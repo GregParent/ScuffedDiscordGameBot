@@ -50,10 +50,21 @@ async def on_message(message):
         if retroarchOpen:
             await message.channel.send('Retroarch was already started!')
         else:
+
             retroarchProcess = subprocess.Popen('./retroarch/retroarch.exe')
             if process_exists('retroarch.exe'):
                 retroarchOpen = True
-
+                time.sleep(5)
+                waitingForModeMessage = await message.channel.send('Please choose a mode: (Will default to scuffed mode in 10 seconds)')
+                if message.content.lower().startswith('scuffedmode'):
+                    flag = 0
+                elif message.content.lower().startswith('asciimode'):
+                    flag = 1
+                elif message.content.lower().startswith('gamermode'):
+                    flag = 2
+                else:
+                    flag = 0
+                waitingForModeMessage.delete()
                 time.sleep(1)  # navigate to the history menu for easy game access
                 sendInput("left")
                 sendInput("down")
@@ -88,11 +99,11 @@ async def on_message(message):
             stopMessage = await message.channel.send('No Retroarch process to stop...')
             await asyncio.sleep(10)
             await stopMessage.delete()
-    if message.content.lower().startswith('scuffedmode') and retroarchOpen:
+    if message.content.lower().startswith('scuffedmode'):
         flag = 0
-    if message.content.lower().startswith('asciimode') and retroarchOpen:
+    if message.content.lower().startswith('asciimode'):
         flag = 1
-    if message.content.lower().startswith('gamermode') and retroarchOpen:
+    if message.content.lower().startswith('gamermode'):
         flag = 2
     if message.content.lower().startswith('start') and retroarchOpen:
         sendInput("start")
@@ -174,9 +185,8 @@ async def send_screenshot(channel):
     await asyncio.sleep(1.2)
     await message.delete()
 
-
 async def send_ascii_screenshot(channel):  # ENTER YOUR ASCII CODE HERE
-    print("Here!")
+    print("HERE")
 
 with open('token.json') as json_file:
     token_json = json.load(json_file)
