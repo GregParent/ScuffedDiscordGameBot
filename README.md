@@ -43,6 +43,7 @@ Left Analog Right | ,
 ## Discord Commands
 ```The controls for the Emulator are:
 Start emulator = emuStart
+Start emulator in asciimode = emuStart asciimode
 Stop emulator = emuStop
 Open RetroArch menu = F1
 START = start

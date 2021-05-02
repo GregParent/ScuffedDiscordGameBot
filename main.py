@@ -23,6 +23,7 @@ client = discord.Client()
 retroarchOpen = False
 retroarchProcess = None
 modeFlag = 0  # 0 represents normal screenshots and 1 represents ASCII mode and 2 represents GAMER mode
+ascii_message = None
 
 
 @client.event
@@ -35,6 +36,7 @@ async def on_message(message):
     global retroarchOpen
     global retroarchProcess
     global modeFlag
+    global ascii_message
 
     if message.author == client.user:
         return
@@ -59,8 +61,6 @@ async def on_message(message):
                         modeFlag = 0
                     elif modeParam.lower().startswith('asciimode'):
                         modeFlag = 1
-                    elif modeParam.lower().startswith('gamermode'):
-                        modeFlag = 2
                     else:
                         modeFlag = 0
                 else:
@@ -79,7 +79,8 @@ async def on_message(message):
                     await asyncio.sleep(10)
                     await startMessage.delete()
                 elif modeFlag == 1:
-                    send_ascii_screenshot.start(message.channel)  # start the screenshot thread
+                    ascii_message = await first_ascii_screenshot(message.channel)
+                    send_ascii_screenshot.start(ascii_message)  # start the screenshot thread
                     startMessage = await message.channel.send('Started Retroarch!')
                     await asyncio.sleep(10)
                     await startMessage.delete()
@@ -92,6 +93,12 @@ async def on_message(message):
         if retroarchOpen:
             retroarchProcess.terminate()
             send_screenshot.stop()
+            send_ascii_screenshot.stop()
+
+            if ascii_message is not None:
+                await ascii_message.delete()
+                ascii_message = None
+
             retroarchOpen = False
             stopMessage = await message.channel.send('Stopped Retroarch!')
             await asyncio.sleep(10)
@@ -100,12 +107,6 @@ async def on_message(message):
             stopMessage = await message.channel.send('No Retroarch process to stop...')
             await asyncio.sleep(10)
             await stopMessage.delete()
-    if message.content.lower().startswith('scuffedmode'):
-        modeFlag = 0
-    if message.content.lower().startswith('asciimode'):
-        modeFlag = 1
-    if message.content.lower().startswith('gamermode'):
-        modeFlag = 2
     if message.content.lower().startswith('start') and retroarchOpen:
         sendInput("start")
     if message.content.lower().startswith('select') and retroarchOpen:
@@ -186,9 +187,7 @@ async def send_screenshot(channel):
     await asyncio.sleep(1.2)
     await message.delete()
 
-
-@tasks.loop(seconds=1.0)
-async def send_ascii_screenshot(channel):  # ENTER YOUR ASCII CODE HERE
+async def first_ascii_screenshot(channel):
     # take a screenshot and save to disk
     toplist, winlist = [], []
 
@@ -204,9 +203,9 @@ async def send_ascii_screenshot(channel):  # ENTER YOUR ASCII CODE HERE
 
     # win32gui.SetForegroundWindow(hwnd)
     bbox = win32gui.GetWindowRect(hwnd)
-    chars = np.asarray(list(' .,:;irsXA253hMHGS#9B&@'))
+    chars = np.asarray(list('░▒▓█'))
 
-    f, SC, GCF, WCF = .1, .1, 1, 7 / 4
+    f, SC, GCF, WCF = .1, .0355, 1, 7 / 4
 
     img = ImageGrab.grab(bbox)
     S = (round(img.size[0] * SC * WCF), round(img.size[1] * SC))
@@ -214,8 +213,37 @@ async def send_ascii_screenshot(channel):  # ENTER YOUR ASCII CODE HERE
     img -= img.min()
     img = (1.0 - img / img.max()) ** GCF * (chars.size - 1)
 
-    message = await channel.content("\n".join(("".join(r) for r in chars[img.astype(int)])))
-    await asyncio.sleep(1.2)
+    message = await channel.send("```" + "\n".join(("".join(r) for r in chars[img.astype(int)])) + "```")
+    return message
+
+@tasks.loop(seconds=1.0)
+async def send_ascii_screenshot(message):  # ENTER YOUR ASCII CODE HERE
+    # take a screenshot and save to disk
+    toplist, winlist = [], []
+
+    def enum_cb(hwnd, results):
+        winlist.append((hwnd, win32gui.GetWindowText(hwnd)))
+
+    win32gui.EnumWindows(enum_cb, toplist)
+
+    retroarch = [(hwnd, title) for hwnd, title in winlist if 'retroarch' in title.lower()]
+    # just grab the hwnd for first window matching retroarch
+    retroarch = retroarch[0]
+    hwnd = retroarch[0]
+
+    # win32gui.SetForegroundWindow(hwnd)
+    bbox = win32gui.GetWindowRect(hwnd)
+    chars = np.asarray(list('░▒▓█'))
+
+    f, SC, GCF, WCF = .1, .0355, 1, 7 / 4
+
+    img = ImageGrab.grab(bbox)
+    S = (round(img.size[0] * SC * WCF), round(img.size[1] * SC))
+    img = np.sum(np.asarray(img.resize(S)), axis=2)
+    img -= img.min()
+    img = (1.0 - img / img.max()) ** GCF * (chars.size - 1)
+
+    await message.edit(content=("```" + "\n".join(("".join(r) for r in chars[img.astype(int)])) + "```"))
 
 
 with open('token.json') as json_file:
