@@ -22,7 +22,7 @@ client = discord.Client()
 
 retroarchOpen = False
 retroarchProcess = None
-flag = 0  # 0 represents normal screenshots and 1 represents ASCII mode and 2 represents GAMER mode
+modeFlag = 0  # 0 represents normal screenshots and 1 represents ASCII mode and 2 represents GAMER mode
 
 
 @client.event
@@ -34,7 +34,7 @@ async def on_ready():
 async def on_message(message):
     global retroarchOpen
     global retroarchProcess
-    global flag
+    global modeFlag
 
     if message.author == client.user:
         return
@@ -53,28 +53,40 @@ async def on_message(message):
             retroarchProcess = subprocess.Popen('./retroarch/retroarch.exe')
             if process_exists('retroarch.exe'):
                 retroarchOpen = True
-
-                time.sleep(1)  # navigate to the history menu for easy game access
-                sendInput("left")
-                sendInput("down")
-                sendInput("down")
-                sendInput("down")
-                sendInput("right")
-
-                if flag == 0:
-                    send_screenshot.start(message.channel)  # start the screenshot thread
-                    startMessage = await message.channel.send('Started Retroarch!')
-                    await asyncio.sleep(10)
-                    await startMessage.delete()
-                elif flag == 1:
-                    send_ascii_screenshot.start(message.channel)  # start the screenshot thread
-                    startMessage = await message.channel.send('Started Retroarch!')
-                    await asyncio.sleep(10)
-                    await startMessage.delete()
+            if len(message.content) > 8:
+                modeParam = message.content.split()[1]
+                if modeParam.lower().startswith('scuffedmode'):
+                    modeFlag = 0
+                elif modeParam.lower().startswith('asciimode'):
+                    modeFlag = 1
+                elif modeParam.lower().startswith('gamermode'):
+                    modeFlag = 2
+                else:
+                    modeFlag = 0
             else:
-                startMessage = await message.channel.send('Retroarch was not started...')
-                await asyncio.sleep(10)
-                await startMessage.delete()
+                modeFlag = 0
+
+        time.sleep(1)  # navigate to the history menu for easy game access
+        sendInput("left")
+        sendInput("down")
+        sendInput("down")
+        sendInput("down")
+        sendInput("right")
+
+        if modeFlag == 0:
+            send_screenshot.start(message.channel)  # start the screenshot thread
+            startMessage = await message.channel.send('Started Retroarch!')
+            await asyncio.sleep(10)
+            await startMessage.delete()
+        elif modeFlag == 1:
+            send_ascii_screenshot.start(message.channel)  # start the screenshot thread
+            startMessage = await message.channel.send('Started Retroarch!')
+            await asyncio.sleep(10)
+            await startMessage.delete()
+    else:
+        startMessage = await message.channel.send('Retroarch was not started...')
+        await asyncio.sleep(10)
+        await startMessage.delete()
 
     if message.content.startswith('emuStop'):
         if retroarchOpen:
@@ -88,52 +100,52 @@ async def on_message(message):
             stopMessage = await message.channel.send('No Retroarch process to stop...')
             await asyncio.sleep(10)
             await stopMessage.delete()
-    if message.content.lower().startswith('scuffedmode') and retroarchOpen:
-        flag = 0
-    if message.content.lower().startswith('asciimode') and retroarchOpen:
-        flag = 1
-    if message.content.lower().startswith('gamermode') and retroarchOpen:
-        flag = 2
-    if message.content.lower().startswith('start') and retroarchOpen:
-        sendInput("start")
-    if message.content.lower().startswith('select') and retroarchOpen:
-        sendInput("select")
-    if message.content.lower().startswith('up') and retroarchOpen:
-        sendInput("up")
-    if message.content.lower().startswith('down') and retroarchOpen:
-        sendInput("down")
-    if message.content.lower().startswith('left') and retroarchOpen:
-        sendInput("left")
-    if message.content.lower().startswith('right') and retroarchOpen:
-        sendInput("right")
-    if message.content.lower().startswith('a') and retroarchOpen:
-        sendInput("a")
-    if message.content.lower().startswith('b') and retroarchOpen:
-        sendInput("b")
-    if message.content.lower().startswith('x') and retroarchOpen:
-        sendInput("x")
-    if message.content.lower().startswith('y') and retroarchOpen:
-        sendInput("y")
-    if message.content.lower().startswith('l1') and retroarchOpen:
-        sendInput("l1")
-    if message.content.lower().startswith('r1') and retroarchOpen:
-        sendInput("r1")
-    if message.content.lower().startswith('l2') and retroarchOpen:
-        sendInput("l2")
-    if message.content.lower().startswith('r2') and retroarchOpen:
-        sendInput("r2")
-    if message.content.lower().startswith('l3') and retroarchOpen:
-        sendInput("l3")
-    if message.content.lower().startswith('r3') and retroarchOpen:
-        sendInput("r3")
-    if message.content.lower().startswith('anu') and retroarchOpen:
-        sendInput("anu")
-    if message.content.lower().startswith('and') and retroarchOpen:
-        sendInput("and")
-    if message.content.lower().startswith('anl') and retroarchOpen:
-        sendInput("anl")
-    if message.content.lower().startswith('anr') and retroarchOpen:
-        sendInput("anr")
+        if message.content.lower().startswith('scuffedmode'):
+            modeFlag = 0
+        if message.content.lower().startswith('asciimode'):
+            modeFlag = 1
+        if message.content.lower().startswith('gamermode'):
+            modeFlag = 2
+        if message.content.lower().startswith('start') and retroarchOpen:
+            sendInput("start")
+        if message.content.lower().startswith('select') and retroarchOpen:
+            sendInput("select")
+        if message.content.lower().startswith('up') and retroarchOpen:
+            sendInput("up")
+        if message.content.lower().startswith('down') and retroarchOpen:
+            sendInput("down")
+        if message.content.lower().startswith('left') and retroarchOpen:
+            sendInput("left")
+        if message.content.lower().startswith('right') and retroarchOpen:
+            sendInput("right")
+        if message.content.lower().startswith('a') and retroarchOpen:
+            sendInput("a")
+        if message.content.lower().startswith('b') and retroarchOpen:
+            sendInput("b")
+        if message.content.lower().startswith('x') and retroarchOpen:
+            sendInput("x")
+        if message.content.lower().startswith('y') and retroarchOpen:
+            sendInput("y")
+        if message.content.lower().startswith('l1') and retroarchOpen:
+            sendInput("l1")
+        if message.content.lower().startswith('r1') and retroarchOpen:
+            sendInput("r1")
+        if message.content.lower().startswith('l2') and retroarchOpen:
+            sendInput("l2")
+        if message.content.lower().startswith('r2') and retroarchOpen:
+            sendInput("r2")
+        if message.content.lower().startswith('l3') and retroarchOpen:
+            sendInput("l3")
+        if message.content.lower().startswith('r3') and retroarchOpen:
+            sendInput("r3")
+        if message.content.lower().startswith('anu') and retroarchOpen:
+            sendInput("anu")
+        if message.content.lower().startswith('and') and retroarchOpen:
+            sendInput("and")
+        if message.content.lower().startswith('anl') and retroarchOpen:
+            sendInput("anl")
+        if message.content.lower().startswith('anr') and retroarchOpen:
+            sendInput("anr")
     await message.delete()
 
 
@@ -174,6 +186,7 @@ async def send_screenshot(channel):
     await asyncio.sleep(1.2)
     await message.delete()
 
+
 @tasks.loop(seconds=1.0)
 async def send_ascii_screenshot(channel):  # ENTER YOUR ASCII CODE HERE
     # take a screenshot and save to disk
@@ -203,6 +216,7 @@ async def send_ascii_screenshot(channel):  # ENTER YOUR ASCII CODE HERE
 
     message = await channel.content("\n".join(("".join(r) for r in chars[img.astype(int)])))
     await asyncio.sleep(1.2)
+
 
 with open('token.json') as json_file:
     token_json = json.load(json_file)
