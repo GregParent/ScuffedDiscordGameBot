@@ -22,6 +22,7 @@ client = discord.Client()
 
 retroarchOpen = False
 retroarchProcess = None
+flag = 0  # 0 represents normal screenshots and 1 represents ASCII mode and 2 represents GAMER mode
 
 
 @client.event
@@ -33,6 +34,7 @@ async def on_ready():
 async def on_message(message):
     global retroarchOpen
     global retroarchProcess
+    global flag
 
     if message.author == client.user:
         return
@@ -59,10 +61,16 @@ async def on_message(message):
                 sendInput("down")
                 sendInput("right")
 
-                send_screenshot.start(message.channel)  # start the screenshot thread
-                startMessage = await message.channel.send('Started Retroarch!')
-                await asyncio.sleep(10)
-                await startMessage.delete()
+                if flag == 0:
+                    send_screenshot.start(message.channel)  # start the screenshot thread
+                    startMessage = await message.channel.send('Started Retroarch!')
+                    await asyncio.sleep(10)
+                    await startMessage.delete()
+                elif flag == 1:
+                    send_ascii_screenshot.start(message.channel)  # start the screenshot thread
+                    startMessage = await message.channel.send('Started Retroarch!')
+                    await asyncio.sleep(10)
+                    await startMessage.delete()
             else:
                 startMessage = await message.channel.send('Retroarch was not started...')
                 await asyncio.sleep(10)
@@ -80,7 +88,12 @@ async def on_message(message):
             stopMessage = await message.channel.send('No Retroarch process to stop...')
             await asyncio.sleep(10)
             await stopMessage.delete()
-
+    if message.content.lower().startswith('scuffedmode') and retroarchOpen:
+        flag = 0
+    if message.content.lower().startswith('asciimode') and retroarchOpen:
+        flag = 1
+    if message.content.lower().startswith('gamermode') and retroarchOpen:
+        flag = 2
     if message.content.lower().startswith('start') and retroarchOpen:
         sendInput("start")
     if message.content.lower().startswith('select') and retroarchOpen:
@@ -123,6 +136,7 @@ async def on_message(message):
         sendInput("anr")
     await message.delete()
 
+
 def process_exists(process_name):
     call = 'TASKLIST', '/FI', 'imagename eq %s' % process_name
     # use buildin check_output right away
@@ -160,6 +174,9 @@ async def send_screenshot(channel):
     await asyncio.sleep(1.2)
     await message.delete()
 
+
+async def send_ascii_screenshot(channel):  # ENTER YOUR ASCII CODE HERE
+    print("Here!")
 
 with open('token.json') as json_file:
     token_json = json.load(json_file)
